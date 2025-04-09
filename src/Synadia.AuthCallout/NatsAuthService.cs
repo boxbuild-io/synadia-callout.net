@@ -55,19 +55,22 @@ public class NatsAuthService : INatsAuthService
                 {
                     _logger.LogInformation(e, "Auth error");
                     await CallErrorHandlerAsync(e, cancellationToken);
-                    await msg.ReplyErrorAsync(401, "Unauthorized", cancellationToken: cancellationToken);
+                    var r = new NatsAuthorizationResponse { Error = e.Message, };
+                    await msg.ReplyErrorAsync(401, "Unauthorized", data: r, cancellationToken: cancellationToken);
                 }
                 catch (NatsAuthServiceException e)
                 {
                     _logger.LogWarning(e, "Service error");
                     await CallErrorHandlerAsync(e, cancellationToken);
-                    await msg.ReplyErrorAsync(400, e.Message, cancellationToken: cancellationToken);
+                    var r = new NatsAuthorizationResponse { Error = e.Message, };
+                    await msg.ReplyErrorAsync(400, e.Message, data: r, cancellationToken: cancellationToken);
                 }
                 catch (Exception e)
                 {
                     _logger.LogError(e, "Generic error");
                     await CallErrorHandlerAsync(e, cancellationToken);
-                    await msg.ReplyErrorAsync(400, e.Message, cancellationToken: cancellationToken);
+                    var r = new NatsAuthorizationResponse { Error = e.Message, };
+                    await msg.ReplyErrorAsync(400, e.Message, data: r, cancellationToken: cancellationToken);
                 }
             },
             name: "auth-request-handler",
